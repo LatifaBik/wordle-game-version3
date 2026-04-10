@@ -2,15 +2,16 @@
   "name": "wordle-game-version3",
   "version": "1.0.0",
   "type": "module",
-  
-
   "devDependencies": {
     "cross-env": "^10.1.0",
     "jest": "^30.3.0"
   },
-   "scripts": {
+  "scripts": {
     "start": "node server.js",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   }
 }

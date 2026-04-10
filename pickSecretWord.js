@@ -1,3 +1,4 @@
+
 const words = [
   'apple',
   'grape',
