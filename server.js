@@ -78,8 +78,6 @@ app.post("/api/highscores", async (req, res) => {
   }
 });
 
-
-
 app.get("/highscores", async (req, res) => {
   const db = getDB();
   const scores = await db
@@ -99,8 +97,8 @@ app.get("/highscores", async (req, res) => {
           ${scores
             .map(
               (s) =>
-                `<li>${s.name} - ${s.time_ms} ms - ${s.word_length} bokstäver</li>`
-            )
+               `<li>${s.name} - ${s.time_ms} ms - ${s.word_length} bokstäver - ${new Date(s.created_at).toLocaleString()}</li>`
+               )
             .join("")}
         </ul>
         <a href="/">Tillbaka</a>
@@ -114,14 +112,25 @@ app.get("/highscores", async (req, res) => {
 app.get("/about", (req, res) => {
   res.send(`
     <html>
+      <head>
+        <title>Om projektet</title>
+      </head>
       <body>
         <h1>Om projektet</h1>
-        <p>Detta är ett Wordle-spel byggt med React och Node.js.</p>
-        <a href="/">Tillbaka</a>
+        <p>
+          Detta är ett Wordle-spel byggt med React, Node.js och MongoDB.
+        </p>
+        <p>
+          Du kan spela spelet, gissa ord och spara highscores.
+        </p>
+
+        <a href="http://localhost:5173">Till spelet</a><br/>
+        <a href="http://localhost:5080/highscores">Se highscores</a>
       </body>
     </html>
   `);
 });
+
 
 async function startServer() {
   try {

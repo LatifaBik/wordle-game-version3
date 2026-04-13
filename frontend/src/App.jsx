@@ -99,13 +99,18 @@ useEffect(() => {
 
   return (
     <div style={{ padding: "2rem", fontFamily: "Arial" }}>
-      <h1>Wordle</h1>
+      <h1>Wordle Game</h1>
 
 
     <a href="http://localhost:5080/highscores">
-      Gå till highscores
+      Highscores
     </a>
-    
+
+   <br />
+
+    <a href="http://localhost:5080/about">
+    About projekt</a>
+
       <div style={{ marginBottom: "1rem" }}>
         <label>
           Ordlängd:{" "}
