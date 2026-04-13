@@ -1,4 +1,6 @@
-import { useState } from "react";
+/*import { useState } from "react";*/
+import { useEffect, useState } from "react";
+
 
 export default function App() {
   const [guess, setGuess] = useState("");
@@ -8,6 +10,8 @@ export default function App() {
   const [wordLength, setWordLength] = useState(5);
   const [allowDuplicates, setAllowDuplicates] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [name, setName] = useState("");
+  const [highscores, setHighscores] = useState([]);
 
   async function startGame() {
     const response = await fetch(
@@ -19,6 +23,7 @@ export default function App() {
     setFeedback([]);
     setHistory([]);
     setGuess("");
+    setName("");
     setMessage(data.message);
   }
 
@@ -50,6 +55,39 @@ export default function App() {
       setMessage("Försök igen");
     }
   }
+
+    async function loadHighscores() {
+  const response = await fetch("http://localhost:5080/api/highscores");
+  const data = await response.json();
+  setHighscores(data);
+}
+
+useEffect(() => {
+  loadHighscores();
+}, []);
+
+  async function saveScore() {
+  const response = await fetch("http://localhost:5080/api/highscores", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name,
+      time: 10000,
+      guesses: history,
+      wordLength,
+      allowDuplicates,
+    }),
+  });
+
+  const data = await response.json();
+
+  alert(data.message || "Score sparad!");
+
+  await loadHighscores();
+}
+
 
   function getColor(result) {
     if (result === "correct") return "green";
@@ -100,6 +138,20 @@ export default function App() {
         </form>
       )}
 
+      {message === "Du gissade rätt!" && (
+        <div style={{ marginTop: "1rem" }}>
+          <input
+            type="text"
+            placeholder="Ditt namn"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <button onClick={saveScore} style={{ marginLeft: "0.5rem" }}>
+            Spara score
+          </button>
+        </div>
+      )}
+
       <h2>Senaste gissning</h2>
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "2rem" }}>
         {feedback.map((item, index) => (
@@ -147,7 +199,17 @@ export default function App() {
             </div>
           ))}
         </div>
+
       ))}
+
+      <h2>Highscores</h2>
+<ul>
+  {highscores.map((score) => (
+    <li key={score.id}>
+      {score.name} - {score.time_ms} ms - {score.word_length} bokstäver
+    </li>
+  ))}
+</ul>
     </div>
   );
 }
