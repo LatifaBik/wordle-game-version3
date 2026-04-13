@@ -66,6 +66,8 @@ useEffect(() => {
   loadHighscores();
 }, []);
 
+
+
   async function saveScore() {
   const response = await fetch("http://localhost:5080/api/highscores", {
     method: "POST",
@@ -99,6 +101,11 @@ useEffect(() => {
     <div style={{ padding: "2rem", fontFamily: "Arial" }}>
       <h1>Wordle</h1>
 
+
+    <a href="http://localhost:5080/highscores">
+      Gå till highscores
+    </a>
+    
       <div style={{ marginBottom: "1rem" }}>
         <label>
           Ordlängd:{" "}
@@ -210,6 +217,8 @@ useEffect(() => {
     </li>
   ))}
 </ul>
+
     </div>
+
   );
 }

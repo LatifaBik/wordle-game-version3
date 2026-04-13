@@ -80,21 +80,47 @@ app.post("/api/highscores", async (req, res) => {
 
 
 
-app.get("/api/highscores", async (req, res) => {
-  try {
-    const db = getDB();
+app.get("/highscores", async (req, res) => {
+  const db = getDB();
+  const scores = await db
+    .collection("highscores")
+    .find({})
+    .sort({ time_ms: 1 })
+    .toArray();
 
-    const rows = await db
-      .collection("highscores")
-      .find({})
-      .sort({ time_ms: 1 })
-      .toArray();
+  const html = `
+    <html>
+      <head>
+        <title>Highscores</title>
+      </head>
+      <body>
+        <h1>Highscores</h1>
+        <ul>
+          ${scores
+            .map(
+              (s) =>
+                `<li>${s.name} - ${s.time_ms} ms - ${s.word_length} bokstäver</li>`
+            )
+            .join("")}
+        </ul>
+        <a href="/">Tillbaka</a>
+      </body>
+    </html>
+  `;
 
-    res.json(rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch highscores" });
-  }
+  res.send(html);
+});
+
+app.get("/about", (req, res) => {
+  res.send(`
+    <html>
+      <body>
+        <h1>Om projektet</h1>
+        <p>Detta är ett Wordle-spel byggt med React och Node.js.</p>
+        <a href="/">Tillbaka</a>
+      </body>
+    </html>
+  `);
 });
 
 async function startServer() {
