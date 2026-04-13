@@ -1,16 +1,17 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 import pickSecretWord from "./backend/pickSecretWord.js";
 import guessedWord from "./backend/guessedWord.js";
-import { connectDB, getDB } from "./backend/db.js";
-
+import highscoreRoutes from "./backend/Routes/highscoreRoutes.js";
+import Highscore from "./backend/models/Highscore.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+app.use("/api", highscoreRoutes);
 
 let currentWord = "";
 
@@ -50,41 +51,8 @@ app.post("/api/guess", (req, res) => {
   res.json({ result, isCorrect });
 });
 
-
-
-app.post("/api/highscores", async (req, res) => {
-  try {
-    const { name, time, guesses, wordLength, allowDuplicates } = req.body;
-
-    if (!name || !time || !guesses || !wordLength) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const db = getDB();
-
-    await db.collection("highscores").insertOne({
-      name,
-      time_ms: time,
-      guesses,
-      word_length: wordLength,
-      allow_duplicates: allowDuplicates,
-      created_at: new Date(),
-    });
-
-    res.json({ message: "Highscore saved" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to save highscore" });
-  }
-});
-
 app.get("/highscores", async (req, res) => {
-  const db = getDB();
-  const scores = await db
-    .collection("highscores")
-    .find({})
-    .sort({ time_ms: 1 })
-    .toArray();
+  const scores = await Highscore.find().sort({ time_ms: 1 });
 
   const html = `
     <html>
@@ -97,8 +65,8 @@ app.get("/highscores", async (req, res) => {
           ${scores
             .map(
               (s) =>
-               `<li>${s.name} - ${s.time_ms} ms - ${s.word_length} bokstäver - ${new Date(s.created_at).toLocaleString()}</li>`
-               )
+                `<li>${s.name} - ${s.time_ms} ms - ${s.word_length} bokstäver - ${new Date(s.created_at).toLocaleString()}</li>`
+            )
             .join("")}
         </ul>
         <a href="/">Tillbaka</a>
@@ -117,13 +85,8 @@ app.get("/about", (req, res) => {
       </head>
       <body>
         <h1>Om projektet</h1>
-        <p>
-          Detta är ett Wordle-spel byggt med React, Node.js och MongoDB.
-        </p>
-        <p>
-          Du kan spela spelet, gissa ord och spara highscores.
-        </p>
-
+        <p>Detta är ett Wordle-spel byggt med React, Node.js och MongoDB.</p>
+        <p>Du kan spela spelet, gissa ord och spara highscores.</p>
         <a href="http://localhost:5173">Till spelet</a><br/>
         <a href="http://localhost:5080/highscores">Se highscores</a>
       </body>
@@ -131,10 +94,11 @@ app.get("/about", (req, res) => {
   `);
 });
 
-
 async function startServer() {
   try {
-    await connectDB();
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("Connected to MongoDB with Mongoose");
+
     app.listen(process.env.PORT || 5080, () => {
       console.log("Server running on port 5080");
     });
@@ -144,5 +108,3 @@ async function startServer() {
 }
 
 startServer();
-
-
