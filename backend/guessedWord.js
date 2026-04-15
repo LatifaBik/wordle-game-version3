@@ -56,31 +56,3 @@ export default function guessedWord(guessed, secret) {
 
 
 
-/*export default function guessedWord(secretWord, guess) {
-  const result = [];
-  const secretArray = secretWord.split('');
-  const guessArray = guess.split('');
-
-  for (let i = 0; i < guessArray.length; i++) {
-    if (guessArray[i] === secretArray[i]) {
-      result[i] = { letter: guessArray[i], result: 'correct' };
-      secretArray[i] = null;
-      guessArray[i] = null;
-    }
-  }
-
-  for (let i = 0; i < guessArray.length; i++) {
-    if (guessArray[i] !== null) {
-      const foundIndex = secretArray.indexOf(guessArray[i]);
-
-      if (foundIndex !== -1) {
-        result[i] = { letter: guessArray[i], result: 'misplaced' };
-        secretArray[foundIndex] = null;
-      } else {
-        result[i] = { letter: guessArray[i], result: 'incorrect' };
-      }
-    }
-  }
-
-  return result;
-}*/

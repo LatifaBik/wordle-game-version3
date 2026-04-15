@@ -12,7 +12,7 @@ const words = [
   'bread',
 ];
 
-function hasDuplicates(word) {
+function wordhasDuplicates(word) {
   return new Set(word).size !== word.length;
 }
 
@@ -20,7 +20,7 @@ export default function pickSecretWord(length = 5, allowDuplicates = false) {
   let filteredWords = words.filter((word) => word.length === length);
 
   if (!allowDuplicates) {
-    filteredWords = filteredWords.filter((word) => !hasDuplicates(word));
+    filteredWords = filteredWords.filter((word) => !wordhasDuplicates(word));
   }
 
   if (filteredWords.length === 0) {

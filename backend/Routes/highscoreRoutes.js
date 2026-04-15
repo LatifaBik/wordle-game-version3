@@ -28,6 +28,7 @@ router.post("/highscores", async (req, res) => {
 
 router.get("/highscores", async (req, res) => {
   try {
+    /*const scores = await Highscore.find().sort({ created_at: -1 });*/
     const scores = await Highscore.find().sort({ time_ms: 1 });
     res.json(scores);
   } catch (error) {

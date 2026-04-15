@@ -2,6 +2,15 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import path from "path";
+import { fileURLToPath } from "url";
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendDistPath = path.join(__dirname, "frontend", "dist");
+
+
 
 import highscoreRoutes from "./backend/Routes/highscoreRoutes.js";
 import gameRoutes from "./backend/Routes/gameRoutes.js";
@@ -16,12 +25,16 @@ app.use("/api", highscoreRoutes);
 app.use("/api", gameRoutes);
 app.use("/", pageRoutes);
 
+app.use(express.static(frontendDistPath));
+
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
 
-
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontendDistPath, "index.html"));
+});
 
 async function startServer() {
   try {

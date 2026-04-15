@@ -4,6 +4,7 @@ import Highscore from "../models/Highscore.js";
 const router = express.Router();
 
 router.get("/highscores", async (req, res) => {
+  /*const scores = await Highscore.find().sort({ created_at: -1 });*/
   const scores = await Highscore.find().sort({ time_ms: 1 });
 
   const html = `
