@@ -1,8 +1,8 @@
-/*import { useState } from "react";*/
 import { useEffect, useState } from "react";
-
+import "./App.css";
 
 export default function App() {
+  const [startTime, setStartTime] = useState(null);
   const [guess, setGuess] = useState("");
   const [feedback, setFeedback] = useState([]);
   const [history, setHistory] = useState([]);
@@ -25,6 +25,7 @@ export default function App() {
     setGuess("");
     setName("");
     setMessage(data.message);
+    setStartTime(Date.now());
   }
 
   async function handleSubmit(e) {
@@ -56,40 +57,40 @@ export default function App() {
     }
   }
 
-    async function loadHighscores() {
-  const response = await fetch("http://localhost:5080/api/highscores");
-  const data = await response.json();
-  setHighscores(data);
-}
+  async function loadHighscores() {
+    const response = await fetch("http://localhost:5080/api/highscores");
+    const data = await response.json();
+    setHighscores(data);
+  }
 
-useEffect(() => {
-  loadHighscores();
-}, []);
-
-
+  useEffect(() => {
+    loadHighscores();
+  }, []);
 
   async function saveScore() {
-  const response = await fetch("http://localhost:5080/api/highscores", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name,
-      time: 10000,
-      guesses: history,
-      wordLength,
-      allowDuplicates,
-    }),
-  });
+    const elapsedTime = startTime ? Date.now() - startTime : 0;
 
-  const data = await response.json();
+    const response = await fetch("http://localhost:5080/api/highscores", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        time: elapsedTime,
+        guesses: history,
+        wordLength,
+        allowDuplicates,
+      }),
+    });
 
-  alert(data.message || "Score sparad!");
+    const data = await response.json();
 
-  await loadHighscores();
-}
+    alert(data.message || "Score sparad!");
 
+    await loadHighscores();
+    setStartTime(null);
+  }
 
   function getColor(result) {
     if (result === "correct") return "green";
@@ -98,23 +99,19 @@ useEffect(() => {
   }
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "Arial" }}>
+    <div className="app-container">
       <h1>Wordle Game</h1>
 
+      <div className="nav-links">
+        <a href="http://localhost:5080/highscores">Highscores</a>
+        <a href="http://localhost:5080/about">About projekt</a>
+      </div>
 
-    <a href="http://localhost:5080/highscores">
-      Highscores
-    </a>
-
-   <br />
-
-    <a href="http://localhost:5080/about">
-    About projekt</a>
-
-      <div style={{ marginBottom: "1rem" }}>
+      <div className="game-settings">
         <label>
           Ordlängd:{" "}
           <input
+            className="word-length-input"
             type="number"
             min="1"
             value={wordLength}
@@ -122,7 +119,7 @@ useEffect(() => {
           />
         </label>
 
-        <label style={{ marginLeft: "1rem" }}>
+        <label className="duplicate-label">
           <input
             type="checkbox"
             checked={allowDuplicates}
@@ -131,7 +128,7 @@ useEffect(() => {
           Tillåt dubbla bokstäver
         </label>
 
-        <button onClick={startGame} style={{ marginLeft: "1rem" }}>
+        <button onClick={startGame} className="start-spel-button">
           Starta spel
         </button>
       </div>
@@ -141,45 +138,42 @@ useEffect(() => {
       {gameStarted && (
         <form onSubmit={handleSubmit}>
           <input
+            className="guess-input"
             type="text"
             value={guess}
             onChange={(e) => setGuess(e.target.value)}
             placeholder="Skriv din gissning"
           />
-          <button type="submit">Gissa</button>
+          <button className="guess-button" type="submit">
+            Gissa
+          </button>
         </form>
       )}
 
       {message === "Du gissade rätt!" && (
-        <div style={{ marginTop: "1rem" }}>
+        <div className="save-score-container">
           <input
+            className="name-input"
             type="text"
             placeholder="Ditt namn"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <button onClick={saveScore} style={{ marginLeft: "0.5rem" }}>
+
+          <button onClick={saveScore} className="save-score-button">
             Spara score
           </button>
         </div>
       )}
 
       <h2>Senaste gissning</h2>
-      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "2rem" }}>
+
+      <div className="feedback-container">
         {feedback.map((item, index) => (
           <div
             key={index}
-            style={{
-              width: "50px",
-              height: "50px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: getColor(item.result),
-              color: "white",
-              fontWeight: "bold",
-              textTransform: "uppercase",
-            }}
+            className="feedback-box"
+            style={{ backgroundColor: getColor(item.result) }}
           >
             {item.letter}
           </div>
@@ -188,42 +182,27 @@ useEffect(() => {
 
       <h2>Tidigare gissningar</h2>
       {history.map((row, rowIndex) => (
-        <div
-          key={rowIndex}
-          style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}
-        >
+        <div key={rowIndex} className="history-row">
           {row.map((item, colIndex) => (
             <div
               key={colIndex}
-              style={{
-                width: "50px",
-                height: "50px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: getColor(item.result),
-                color: "white",
-                fontWeight: "bold",
-                textTransform: "uppercase",
-              }}
+              className="history-box"
+              style={{ backgroundColor: getColor(item.result) }}
             >
               {item.letter}
             </div>
           ))}
         </div>
-
       ))}
 
       <h2>Highscores</h2>
-<ul>
-  {highscores.map((score) => (
-    <li key={score.id}>
-      {score.name} - {score.time_ms} ms - {score.word_length} bokstäver
-    </li>
-  ))}
-</ul>
-
+      <ul className="highscore-list">
+        {highscores.map((score) => (
+          <li key={score.id}>
+            {score.name} - {score.time_ms} ms - {score.word_length} bokstäver
+          </li>
+        ))}
+      </ul>
     </div>
-
   );
 }
