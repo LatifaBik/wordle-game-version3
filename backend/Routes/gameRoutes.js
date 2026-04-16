@@ -11,10 +11,19 @@ router.get("/new-game", (req, res) => {
   const length = Number(req.query.length) || 5;
   const allowDuplicates = req.query.allowDuplicates === "true";
 
-  currentWord = pickSecretWord(length, allowDuplicates);
-
-  
-
+  const words = [
+  'apple',
+  'grape',
+  'table',
+  'chair',
+  'plant',
+  'stone',
+  'light',
+  'house',
+  'water',
+  'bread',
+];
+currentWord = pickSecretWord(words, length, allowDuplicates);
 
   res.json({
     message: "Game started",
