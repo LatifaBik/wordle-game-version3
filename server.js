@@ -38,12 +38,17 @@ app.get("/", (req, res) => {
 
 async function startServer() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log("Connected to MongoDB with Mongoose");
+    if (process.env.MONGODB_URI) {
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log("Connected to MongoDB with Mongoose");
+    } else {
+      console.log("No MongoDB connection string provided");
+    }
 
     app.listen(process.env.PORT || 5080, () => {
       console.log("Server running on port 5080");
     });
+
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
   }
